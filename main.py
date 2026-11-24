@@ -21,6 +21,7 @@ def main() -> int:
     if "\n" in line or "\r" in line:
         print("error: bio must be a single line", file=sys.stderr)
         return 1
+    # Gate counts characters, not bytes: len() on the str is the right measure.
     if len(line) > MAX_CHARS:
         print(f"error: bio is {len(line)} chars, over the {MAX_CHARS} limit",
               file=sys.stderr)
@@ -30,6 +31,12 @@ def main() -> int:
     path = os.path.join(out_dir, "entry.txt")
     with open(path, "w", encoding="utf-8") as fh:
         fh.write(line)
+    # Read back and confirm the file holds exactly the validated line.
+    with open(path, encoding="utf-8") as fh:
+        if fh.read() != line:
+            print("error: entry.txt does not match the validated bio",
+                  file=sys.stderr)
+            return 1
     return 0
 
 
